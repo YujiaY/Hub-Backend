@@ -1,8 +1,7 @@
 const express = require('express');
 const path = require('path');
 
-require('dotenv').config({ path: path.resolve(__dirname, '../src/.env')});
-const db = require('./utils/db');
+const {connectToDB} =require('./utils/db');
 
 const app = express();
 
@@ -19,11 +18,13 @@ app.use('/', (req, res) => {
   res.json('Hello, world!');
 });
 
-db.initDb((err, db) => {
-  if (err) {
-    console.log(err)
-  }  else {
-       app.listen(process.env.SERVER_PORT);
-  }
-  }
-);
+connectToDB()
+  .then(() => {
+  console.log('DB Connected.')
+  app.listen(process.env.SERVER_PORT);
+})
+  .catch(e => {
+    console.log('DB Connection Failed!');
+    console.error(e.message);
+    process.exit(1);
+  });
