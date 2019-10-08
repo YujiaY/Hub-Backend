@@ -1,8 +1,9 @@
 const express = require('express');
+require('express-async-errors');
 const path = require('path');
 
 const {connectToDB} =require('./utils/db');
-
+const errorHandler = require('./middleware/errorHandler');
 const app = express();
 
 const propertyRoutes = require('./routes/property');
@@ -14,6 +15,7 @@ app.use('/images', express.static(path.join('backend/images')));
 
 app.use('/property', propertyRoutes);
 app.use('/auth', authRoutes);
+app.use(errorHandler);
 app.use('/', (req, res) => {
   res.json('Hello, world!');
 });

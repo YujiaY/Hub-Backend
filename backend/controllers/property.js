@@ -11,7 +11,10 @@ async function getProperty(req, res) {
   const id = new mongodb.ObjectId(req.params.id);
   const property = await Property.findById(id);
   if (!property) {
-    return  res.status(404).json({message: 'Property not found.'});
+    return  res.status(404).json({
+      status: "error",
+      message: 'Property not found.'
+    });
   }
   return res.json(property);
 };
@@ -31,14 +34,13 @@ async function addProperty(req, res) {
     paymentInterval: req.body.paymentInterval,
     content: req.body.content,
   });
-  await newProperty.save(function(err, resultAfterSave) {
-    if (err) {
-      return res.status(500).json(err.errors);
+  await newProperty.save();
+  return res.status(201).json({
+    status: 'ok',
+    message: "Property saved.",
+    data:{
+      PropertyID: newProperty._id
     }
-    return res.status(201).json({
-      message: "Property saved.",
-      PropertyID: resultAfterSave._id
-    });
   });
 };
 
@@ -77,12 +79,16 @@ async function updateProperty(req, res) {
   );
   if (!updatedProperty) {
     return res.status(404).json({
+      status: "error",
       message: 'Property not found!'
     });
   };
   return res.status(200).json({
-      message: "Property updated.",
+    status: 'ok',
+    message: "Property updated.",
+    data: {
       PropertyID: updatedProperty._id
+    }
     });
 }
 
@@ -91,12 +97,16 @@ async function deleteProperty(req, res) {
   const deletedProperty = await Property.findByIdAndDelete(id);
   if (!deletedProperty) {
     return res.status(404).json({
+      status: "error",
       message: 'Property not found!'
     })
   };
   return res.status(200).json({
+    status: 'ok',
     message: "Property deleted.",
-    PropertyID: req.params._id
+    data: {
+      PropertyID: req.params._id
+    }
   });
 
 }

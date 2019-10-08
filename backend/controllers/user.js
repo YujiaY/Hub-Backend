@@ -18,7 +18,7 @@ async function adminAddUser(req, res) {
       });
       await user.save(function (err, savedUser) {
         if (err) {
-          return res.status(500).json(err.errmsg);
+          return res.status(500).json(err.errmsg || err.errors);
         }
         const token = createToken(isAdmin);
         return res
@@ -46,7 +46,7 @@ async function signUpUser (req, res) {
       await user.save(function (err, savedUser) {
         if (err) {
           console.log(err);
-          return res.status(500).json(err.errmsg);
+          return res.status(500).json(err.errmsg || err.errors);
         }
         const token = createToken(isAdmin);
         return res

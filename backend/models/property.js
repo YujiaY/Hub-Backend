@@ -1,34 +1,6 @@
 const mongoose = require('mongoose');
 
-// const addressSchema = new mongoose.Schema({
-//   unitNo: {
-//     type: Number,
-//     required: true
-//   },
-//   streetNo: {
-//     type: String,
-//     required: true
-//   },
-//   streetName: {
-//     type: String,
-//     required: true
-//   },
-//   suburbName: {
-//     type: String,
-//     required: true
-//   },
-//   stateName: {
-//     type: String,
-//     required: true
-//   },
-//   postcode: {
-//     type: Number,
-//     required: true
-//   }
-// })
-
 const propertySchema = new mongoose.Schema({
-  // address: [addressSchema],
   address: {
     unitNo: {
       type: Number,
