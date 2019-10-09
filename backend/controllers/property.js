@@ -3,13 +3,17 @@ const Property = require('../models/property');
 const mongodb = require('mongodb');
 
 async function getAllProperties(req, res) {
-  const properties = await Property.find().exec();
+  const properties = await Property.find()
+    .populate('user', 'email')
+    .exec();
   return res.status(200).json(properties);
 }
 
 async function getProperty(req, res) {
   const id = new mongodb.ObjectId(req.params.id);
-  const property = await Property.findById(id);
+  const property = await Property.findById(id)
+    .populate('user', 'email')
+    .exec();
   if (!property) {
     return  res.status(404).json({
       status: "error",

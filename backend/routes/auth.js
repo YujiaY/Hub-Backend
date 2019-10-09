@@ -7,13 +7,12 @@ const {
   signUpUser,
   adminAddUser,
   loginUser,
-} = require("../controllers/user");
+} = require("../controllers/auth");
 
 const router = express.Router();
 
 router.post('/signup', signUpUser);
 router.post('/adminAddUser', adminAddUser);
 router.post('/login', loginUser);
-
 
 module.exports = router;

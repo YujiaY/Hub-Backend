@@ -1,96 +1,83 @@
 const User = require('../models/user');
+const Property = require('../models/property');
 
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+const mongodb = require('mongodb');
 
-function createToken(userRole) {
-  return jwt.sign({isAdmin: userRole}, process.env.JWT_PRIVATEKEY, {expiresIn: '1h'});
+async function getUser(req, res) {
+  const {id} = req.params;
+
+  const user = await User.findById(id)
+    .populate('properties', 'title')
+    .exec();
+
+  if (!user) {
+    return  res.status(404).json({
+      status: "error",
+      message: 'User not found.'
+    });
+  };
+  return res.status(201).json({
+    status: 'ok',
+    data: user
+  });
+}
+
+async function getAllUsers(req, res) {
+  const users = await User.find()
+    .populate('properties', 'title')
+    .exec();
+
+  if (!users.length) {
+    return  res.status(404).json({
+      status: "error",
+      message: 'There is no user.'
+    });
+  };
+  return res.status(201).json({
+    status: 'ok',
+    data: users
+  });
 };
 
-//TODO:
-async function adminAddUser(req, res) {
-  const {email, password, isAdmin} = req.body;
-
-  bcrypt.genSalt(8, function (err, salt) {
-    bcrypt.hash(password, salt, async function (err, hashedPW) {
-      const user = new User({
-        email, password: hashedPW, isAdmin
-      });
-      await user.save(function (err, savedUser) {
-        if (err) {
-          return res.status(500).json(err.errmsg || err.errors);
-        }
-        const token = createToken(isAdmin);
-        return res
-          .status(201)
-          .json({
-            token: token,
-            user: {email: email},
-            UserID: savedUser._id
-          });
-      });
-
-    });
+async function userGetAllProperties(req, res) {
+  const properties = await Property.find({
+    user: new mongodb.ObjectId(req.params.id)
+  }).exec();
+  return res.status(201).json({
+    status: 'ok',
+    data: properties
   });
+
 }
 
-async function signUpUser (req, res) {
-  const {email, password} = req.body;
-  const isAdmin = false;
-
-  bcrypt.genSalt(8, function (err, salt) {
-    bcrypt.hash(password, salt, async function (err, hashedPW) {
-      const user = new User({
-        email, password: hashedPW, isAdmin
-      });
-      await user.save(function (err, savedUser) {
-        if (err) {
-          console.log(err);
-          return res.status(500).json(err.errmsg || err.errors);
-        }
-        const token = createToken(isAdmin);
-        return res
-            .status(201)
-            .json({
-              token: token,
-              user: {email: email},
-              UserID: savedUser._id
-            });
-        });
-    });
+async function userAddProperty(req, res) {
+  var newProperty = new Property ({
+    address: req.body.address,
+    contact: req.body.contact,
+    title: req.body.title,
+    price: req.body.price,
+    type: req.body.type,
+    bedrooms: req.body.bedrooms,
+    bathrooms: req.body.bathrooms,
+    carpark: req.body.carpark,
+    images: req.body.images,
+    paymentInterval: req.body.paymentInterval,
+    content: req.body.content,
+    user: req.params.id,
   });
-}
-
-async function loginUser(req, res) {
-  try {
-    const {email, password} = req.body;
-
-    const user = await User.findOne({email: email}).exec();
-    if (!user) {
-      return res.status(404).json({ message: 'Authentication failed, invalid username or password.' });
+  await newProperty.save();
+  return res.status(201).json({
+    status: 'ok',
+    message: "Property saved.",
+    data:{
+      PropertyID: newProperty._id
     }
-    const isAdmin = user.isAdmin;
-    bcrypt.compare(password, user.password)
-      .then(result => {
-        if (!result) {
-          return res.status(404).json({ message: 'Authentication failed, invalid username or password.' });
-        }
-        const token = createToken(isAdmin);
-
-        res
-          .status(200)
-          .json({
-            token: token,
-            message: 'Authentication succeeded.'
-          })
-      })
-  } catch (e) {
-     return res.status(500).send(error);
-  }
-}
+  });
+};
 
 module.exports = {
-  signUpUser,
-  adminAddUser,
-  loginUser,
+  getUser,
+  getAllUsers,
+  userGetAllProperties,
+  userAddProperty,
 }
