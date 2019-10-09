@@ -19,7 +19,11 @@ const userSchema = new mongoose.Schema({
   isAdmin: {
     type: Boolean,
     required: true
-  }
+  },
+  properties: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Property'
+  }]
 },
   {timestamps: true})
 
