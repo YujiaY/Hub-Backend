@@ -39,12 +39,30 @@ async function getAllUsers(req, res) {
   });
 };
 
+async function userGetProperty(req, res) {
+  const {id: userId, propertyId} = req.params;
+  console.log(userId);
+  console.log(propertyId);
+  const property = await Property.findById(propertyId).exec();
+  if (!property) {
+    return  res.status(404).json({
+      status: "error",
+      message: 'Property not found.'
+    });
+  }
+  return res.json({
+    status: 'ok',
+    data: property
+  });
+}
+
 async function userGetAllProperties(req, res) {
   const properties = await Property.find({
-    user: new mongodb.ObjectId(req.params.id)
+    user: req.params.id
   }).exec();
   return res.status(201).json({
     status: 'ok',
+    count: properties.length,
     data: properties
   });
 
@@ -66,6 +84,9 @@ async function userAddProperty(req, res) {
     user: req.params.id,
   });
   await newProperty.save();
+  const user = await User.findById(new mongodb.ObjectId(req.params.id)).exec();
+  user.properties.addToSet(new mongodb.ObjectId(newProperty._id));
+  await user.save();
   return res.status(201).json({
     status: 'ok',
     message: "Property saved.",
@@ -73,11 +94,81 @@ async function userAddProperty(req, res) {
       PropertyID: newProperty._id
     }
   });
-};
+}
+
+async function userUpdateProperty(req, res) {
+  const {id: userId, propertyId} = req.params;
+  const {
+    address,
+    contact,
+    title,
+    price,
+    type,
+    bedrooms,
+    bathrooms,
+    carpark,
+    images,
+    paymentInterval,
+    content
+  } = req.body;
+  const updatedProperty = await Property.findByIdAndUpdate(
+    propertyId,
+    {
+      address,
+      contact,
+      title,
+      price,
+      type,
+      bedrooms,
+      bathrooms,
+      carpark,
+      images,
+      paymentInterval,
+      content
+    },
+    {new: true}
+  );
+  if (!updatedProperty) {
+    return res.status(404).json({
+      status: "error",
+      message: 'Property not found!'
+    });
+  };
+  return res.status(200).json({
+    status: 'ok',
+    message: "Property updated.",
+    data: {
+      PropertyID: updatedProperty._id
+    }
+  });
+}
+
+
+async function userDeleteProperty(req, res) {
+  const {id: userId, propertyId} = req.params;
+  const deletedProperty = await Property.findByIdAndDelete(propertyId);
+  if (!deletedProperty) {
+    return res.status(404).json({
+      status: "error",
+      message: 'Property not found!'
+    })
+  }
+  const user = await User.findById(userId).exec();
+  user.properties.pull(propertyId);
+  await user.save();
+  return res.status(200).json({
+    status: 'ok',
+    message: "Property deleted."
+  });
+}
+
 
 module.exports = {
   getUser,
   getAllUsers,
+  userGetProperty,
   userGetAllProperties,
   userAddProperty,
-}
+  userUpdateProperty,
+  userDeleteProperty,
+};
