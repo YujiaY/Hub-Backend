@@ -11,6 +11,7 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 
 app.use(express.json());
+const PORT = process.env.PORT || 3333;
 app.use('/images', express.static(path.join('backend/images')));
 
 
@@ -25,7 +26,7 @@ app.use('/', (req, res) => {
 connectToDB()
   .then(() => {
   console.log('DB Connected.')
-  app.listen(process.env.SERVER_PORT);
+  app.listen(process.env.PORT);
 })
   .catch(e => {
     console.log('DB Connection Failed!');
