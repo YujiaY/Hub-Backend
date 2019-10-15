@@ -3,8 +3,8 @@ const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-function createToken(userRole) {
-  return jwt.sign({isAdmin: userRole}, process.env.JWT_PRIVATEKEY, {expiresIn: '1h'});
+function createToken(isAdmin, id) {
+  return jwt.sign({isAdmin, id}, process.env.JWT_PRIVATEKEY, {expiresIn: '1h'});
 };
 
 //TODO:
@@ -20,7 +20,7 @@ async function adminAddUser(req, res) {
         if (err) {
           return res.status(500).json(err.errmsg || err.errors);
         }
-        const token = createToken(isAdmin);
+        const token = createToken(isAdmin,savedUser._id);
         return res
           .status(201)
           .json({
@@ -48,7 +48,7 @@ async function signUpUser (req, res) {
           console.log(err);
           return res.status(500).json(err.errmsg || err.errors);
         }
-        const token = createToken(isAdmin);
+        const token = createToken(isAdmin,savedUser._id);
         return res
             .status(201)
             .json({
@@ -75,7 +75,7 @@ async function loginUser(req, res) {
         if (!result) {
           return res.status(404).json({ message: 'Authentication failed, invalid username or password.' });
         }
-        const token = createToken(isAdmin);
+        const token = createToken(isAdmin,user._id);
 
         res
           .status(200)
