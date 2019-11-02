@@ -13,12 +13,19 @@ const {
   userDeleteProperty
 } = require("../controllers/user");
 
-router.get('/:id', adminGuard, getUser);
-router.get('/', adminGuard, getAllUsers);
-router.get('/:id/properties/:propertyId', userGuard, userGetProperty);
-router.get('/:id/properties/', userGuard, userGetAllProperties);
-router.post('/:id/properties/', userGuard, userAddProperty);
-router.patch('/:id/properties/:propertyId', userGuard, userUpdateProperty);
-router.delete('/:id/properties/:propertyId', userGuard, userDeleteProperty);
+// router.get('/:id', adminGuard, getUser);
+router.get('/:id',  getUser);
+// router.get('/', adminGuard, getAllUsers);
+router.get('/',  getAllUsers);
+// router.get('/:id/properties/:propertyId', userGuard, userGetProperty);
+router.get('/:id/properties/:propertyId', userGetProperty);
+// router.get('/:id/properties/', userGuard, userGetAllProperties);
+router.get('/:id/properties/', userGetAllProperties);
+// router.post('/:id/properties/', userGuard, userAddProperty);
+router.post('/:id/properties/', userAddProperty);
+// router.patch('/:id/properties/:propertyId', userGuard, userUpdateProperty);
+router.patch('/:id/properties/:propertyId', userUpdateProperty);
+// router.delete('/:id/properties/:propertyId', userGuard, userDeleteProperty);
+router.delete('/:id/properties/:propertyId', userDeleteProperty);
 
 module.exports = router;
