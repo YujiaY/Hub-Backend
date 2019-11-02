@@ -1,17 +1,26 @@
 const express = require('express');
 require('express-async-errors');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const cors = require('cors');
 const path = require('path');
 
+const routes = require('./routes');
 const {connectToDB} =require('./utils/db');
 const errorHandler = require('./middleware/errorHandler');
 const app = express();
 
-const routes = require('./routes');
 
-app.use(express.json());
 const PORT = process.env.PORT || 3333;
-app.use('/images', express.static(path.join('backend/images')));
+const morganlog =
+  process.env.NODE_ENV === 'production' ? morgan('common') : morgan('dev');
 
+
+app.use(helmet());
+app.use(morganlog);
+app.use(cors());
+app.use(express.json());
+app.use('/images', express.static(path.join('backend/images')));
 
 app.use('/v1', routes);
 app.use(errorHandler);

@@ -12,17 +12,12 @@ function validateToken(token) {
 
 async function headerCheck(req, res) {
   const authHeader = req.header('Authorization');
-  if (!authHeader) return res.status(401).json({
-    status: "error",
-    message: 'Access denied.'
-  });
+  if (!authHeader) return null;
+;
 
   const contentArr = authHeader.split(' ');
   if (contentArr.length !== 2 || contentArr[0] !== 'Bearer') {
-    return res.status(401).json({
-      status: "error",
-      message: 'Access denied.'
-    })
+    return null;
   }
   return contentArr[1];
 }
@@ -38,7 +33,7 @@ async function userGuard(req, res, next) {
   }
 
   return res.status(401).json({
-    status: "error",
+    status: "error3",
     message: 'Access denied.'
   })
 
@@ -46,20 +41,26 @@ async function userGuard(req, res, next) {
 
 async function adminGuard(req, res, next) {
   const reqToken = await headerCheck(req, res);
-  try {
-    const decoded = validateToken(reqToken);
-    if (decoded.isAdmin) {
-      req.user = decoded;
-      return next();
+  if ( reqToken) {
+    try {
+      const decoded = validateToken(reqToken);
+      if (decoded && decoded.isAdmin) {
+        req.user = decoded;
+        return next();
+      } else throw new Error('Not Admin.');
     }
-    throw new Error('Not Admin.');
-    }
-   catch (e) {
-    return res.status(401).json({
-        status: "error",
+    catch (e) {
+      return res.status(401).json({
+        status: "error5",
         message: 'Access denied.'
       })
+    }
   }
+  return res.status(401).json({
+    status: "error6",
+    message: 'Access denied.'
+  })
+
 }
 
 module.exports = {
