@@ -9,6 +9,9 @@ const {
   deleteProperty
 } = require("../controllers/property");
 
+const {adminGuard} = require('../middleware/authGuard');
+
+
 // Get all properties details
 router.get('/', getAllProperties);
 
@@ -17,14 +20,14 @@ router.get('/:id', getProperty);
 
 // TODO:
 // post: equires logged in user
-router.post('/', addProperty);
+router.post('/', adminGuard, addProperty);
 
 // TODO:
 // patch: Requires logged in user
-router.patch('/:id', updateProperty);
+router.patch('/:id', adminGuard, updateProperty);
 
 // TODO:
 // Requires logged in user
-router.delete('/:id', deleteProperty);
+router.delete('/:id', adminGuard, deleteProperty);
 
 module.exports = router;
