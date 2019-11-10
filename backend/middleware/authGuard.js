@@ -10,7 +10,7 @@ function validateToken(token) {
   return decoded;
 }
 
-async function headerCheck(req, res) {
+async function headerCheck(req) {
   const authHeader = req.header('Authorization');
   if (!authHeader) return null;
 ;
@@ -23,7 +23,7 @@ async function headerCheck(req, res) {
 }
 
 async function userGuard(req, res, next) {
-  const {id} = req.params;
+  const { id } = req.params;
 
   const reqToken = await headerCheck(req, res);
   const decoded = validateToken(reqToken);
@@ -33,37 +33,35 @@ async function userGuard(req, res, next) {
   }
 
   return res.status(401).json({
-    status: "error3",
-    message: 'Access denied.'
-  })
+    status: 'error3',
+    message: 'Access denied.',
+  });
 
-};
+}
 
 async function adminGuard(req, res, next) {
   const reqToken = await headerCheck(req, res);
-  if ( reqToken) {
+  if (reqToken) {
     try {
       const decoded = validateToken(reqToken);
       if (decoded && decoded.isAdmin) {
         req.user = decoded;
         return next();
-      } else throw new Error('Not Admin.');
-    }
-    catch (e) {
+      } throw new Error('Not Admin.');
+    } catch (e) {
       return res.status(401).json({
-        status: "error5",
-        message: 'Access denied.'
-      })
+        status: 'error5',
+        message: 'Access denied.',
+      });
     }
   }
   return res.status(401).json({
-    status: "error6",
-    message: 'Access denied.'
-  })
-
+    status: 'error6',
+    message: 'Access denied.',
+  });
 }
 
 module.exports = {
   userGuard,
-  adminGuard
+  adminGuard,
 };

@@ -1,32 +1,32 @@
-const User = require('../models/user');
-
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const User = require('../models/user');
 
 function createToken(isAdmin, id) {
-  return jwt.sign({isAdmin, id}, process.env.JWT_PRIVATEKEY, {expiresIn: '1h'});
-};
+  return jwt.sign({ isAdmin, id }, process.env.JWT_PRIVATEKEY, { expiresIn: '1h' });
+}
 
-//TODO:
 async function adminAddUser(req, res) {
-  const {email, password, isAdmin} = req.body;
+  const { email, password, isAdmin } = req.body;
 
-  bcrypt.genSalt(8, function (err, salt) {
-    bcrypt.hash(password, salt, async function (err, hashedPW) {
+  bcrypt.genSalt(8, (err, salt) => {
+    // eslint-disable-next-line no-shadow
+    bcrypt.hash(password, salt, async (err, hashedPW) => {
       const user = new User({
-        email, password: hashedPW, isAdmin
+        email, password: hashedPW, isAdmin,
       });
-      await user.save(function (err, savedUser) {
+      // eslint-disable-next-line no-shadow
+      await user.save((err, savedUser) => {
         if (err) {
           return res.status(500).json(err.errmsg || err.errors);
         }
-        const token = createToken(isAdmin,savedUser._id);
+        const token = createToken(isAdmin, savedUser._id);
         return res
           .status(201)
           .json({
-            token: token,
-            user: {email: email},
-            UserID: savedUser._id
+            token,
+            user: { email },
+            UserID: savedUser._id,
           });
       });
 
@@ -34,59 +34,61 @@ async function adminAddUser(req, res) {
   });
 }
 
-async function signUpUser (req, res) {
-  const {email, password} = req.body;
+async function signUpUser(req, res) {
+  const { email, password } = req.body;
   const isAdmin = false;
 
-  bcrypt.genSalt(8, function (err, salt) {
-    bcrypt.hash(password, salt, async function (err, hashedPW) {
+  bcrypt.genSalt(8, (err, salt) => {
+    // eslint-disable-next-line no-shadow
+    bcrypt.hash(password, salt, async (err, hashedPW) => {
       const user = new User({
-        email, password: hashedPW, isAdmin
+        email, password: hashedPW, isAdmin,
       });
-      await user.save(function (err, savedUser) {
+      // eslint-disable-next-line no-shadow
+      await user.save((err, savedUser) => {
         if (err) {
           console.log(err);
           return res.status(500).json(err.errmsg || err.errors);
         }
-        const token = createToken(isAdmin,savedUser._id);
+        const token = createToken(isAdmin, savedUser._id);
         return res
-            .status(201)
-            .json({
-              token: token,
-              user: {email: email},
-              UserID: savedUser._id
-            });
-        });
+          .status(201)
+          .json({
+            token,
+            user: { email },
+            UserID: savedUser._id,
+          });
+      });
     });
   });
 }
 
 async function loginUser(req, res) {
   try {
-    const {email, password} = req.body;
+    const { email, password } = req.body;
 
-    const user = await User.findOne({email: email}).exec();
+    const user = await User.findOne({ email }).exec();
     if (!user) {
       return res.status(404).json({ message: 'Authentication failed, invalid username or password.' });
     }
-    const isAdmin = user.isAdmin;
+    const { isAdmin } = user;
     bcrypt.compare(password, user.password)
-      .then(result => {
+      .then((result) => {
         if (!result) {
           return res.status(404).json({ message: 'Authentication failed, invalid username or password.' });
         }
-        const token = createToken(isAdmin,user._id);
-
-        res
+        const token = createToken(isAdmin, user._id);
+        return res
           .status(200)
           .json({
-            token: token,
-            message: 'Authentication succeeded.'
-          })
-      })
+            token,
+            message: 'Authentication succeeded.',
+          });
+      });
   } catch (e) {
-     return res.status(500).send(e);
+    return res.status(500).send(e);
   }
+  return null;
 }
 
 module.exports = {

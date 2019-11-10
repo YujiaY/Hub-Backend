@@ -2,30 +2,31 @@ const mongoose = require('mongoose');
 const Joi = require('@hapi/joi');
 
 const userSchema = new mongoose.Schema({
-  email:{
+  email: {
     type: String,
     lowercase: true,
     required: [true, "Email can't be blank"],
     validate:{
-      validator: email => !Joi.validate(email, Joi.string().email()).error,
-      message: 'Invalid email format.'
+      validator: (email) => !Joi.validate(email, Joi.string().email()).error,
+      message: 'Invalid email format.',
     },
-    index: true}
+    index: true,
+  }
   ,
   password: {
     type: String,
-    required: true
+    required: true,
   },
   isAdmin: {
     type: Boolean,
-    required: true
+    required: true,
   },
   properties: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Property'
-  }]
+    ref: 'Property',
+  }],
 },
-  {timestamps: true})
+{ timestamps: true })
 
 const Model = mongoose.model('User', userSchema);
 

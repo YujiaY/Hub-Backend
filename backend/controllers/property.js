@@ -1,6 +1,5 @@
-const Property = require('../models/property');
-
 const mongodb = require('mongodb');
+const Property = require('../models/property');
 
 async function getAllProperties(req, res) {
   const properties = await Property.find()
@@ -15,17 +14,17 @@ async function getProperty(req, res) {
     .populate('user', 'email')
     .exec();
   if (!property) {
-    return  res.status(404).json({
-      status: "error",
-      message: 'Property not found.'
+    return res.status(404).json({
+      status: 'error',
+      message: 'Property not found.',
     });
   }
   return res.json(property);
-};
+}
 
 
 async function addProperty(req, res) {
-  var newProperty = new Property ({
+  const newProperty = new Property({
     address: req.body.address,
     contact: req.body.contact,
     title: req.body.title,
@@ -41,16 +40,16 @@ async function addProperty(req, res) {
   await newProperty.save();
   return res.status(201).json({
     status: 'ok',
-    message: "Property saved.",
-    data:{
-      PropertyID: newProperty._id
-    }
+    message: 'Property saved.',
+    data: {
+      PropertyID: newProperty._id,
+    },
   });
 };
 
 
 async function updateProperty(req, res) {
-  const id = req.params.id;
+  const { id } = req.params;
   const {
     address,
     contact,
@@ -62,7 +61,7 @@ async function updateProperty(req, res) {
     carpark,
     images,
     paymentInterval,
-    content
+    content,
   } = req.body;
   const updatedProperty = await Property.findByIdAndUpdate(
     id,
@@ -77,42 +76,41 @@ async function updateProperty(req, res) {
       carpark,
       images,
       paymentInterval,
-      content
+      content,
     },
-    {new: true}
+    { new: true },
   );
   if (!updatedProperty) {
     return res.status(404).json({
-      status: "error",
-      message: 'Property not found!'
+      status: 'error',
+      message: 'Property not found!',
     });
   };
   return res.status(200).json({
     status: 'ok',
-    message: "Property updated.",
+    message: 'Property updated.',
     data: {
-      PropertyID: updatedProperty._id
-    }
-    });
+      PropertyID: updatedProperty._id,
+    },
+  });
 }
 
 async function deleteProperty(req, res) {
-  const id = req.params.id;
+  const { id } = req.params;
   const deletedProperty = await Property.findByIdAndDelete(id);
   if (!deletedProperty) {
     return res.status(404).json({
-      status: "error",
-      message: 'Property not found!'
-    })
-  };
+      status: 'error',
+      message: 'Property not found!',
+    });
+  }
   return res.status(200).json({
     status: 'ok',
-    message: "Property deleted.",
+    message: 'Property deleted.',
     data: {
-      PropertyID: req.params._id
-    }
+      PropertyID: req.params._id,
+    },
   });
-
 }
 
 module.exports = {
@@ -120,5 +118,5 @@ module.exports = {
   getAllProperties,
   addProperty,
   updateProperty,
-  deleteProperty
+  deleteProperty,
 }

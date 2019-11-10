@@ -9,4 +9,4 @@ router.use('/auth', authRoute);
 router.use('/user', userRoute);
 router.use('/property', propertyRoute);
 
-module.exports =router;
+module.exports = router;

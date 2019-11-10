@@ -6,14 +6,14 @@ const cors = require('cors');
 const path = require('path');
 
 const routes = require('./routes');
-const {connectToDB} =require('./utils/db');
+const { connectToDB } = require('./utils/db');
 const errorHandler = require('./middleware/errorHandler');
+
 const app = express();
 
 
 const PORT = process.env.PORT || 3333;
-const morganlog =
-  process.env.NODE_ENV === 'production' ? morgan('common') : morgan('dev');
+const morganlog = process.env.NODE_ENV === 'production' ? morgan('common') : morgan('dev');
 
 
 app.use(helmet());
@@ -30,11 +30,11 @@ app.use('/', (req, res) => {
 
 connectToDB()
   .then(() => {
-  console.log('DB Connected.');
-  app.listen(PORT);
-  console.log(`Listening on port: ${PORT}.`);
-})
-  .catch(e => {
+    console.log('DB Connected.');
+    app.listen(PORT);
+    console.log(`Listening on port: ${PORT}.`);
+  })
+  .catch((e) => {
     console.log('DB Connection Failed!');
     console.error(e.message);
     process.exit(1);

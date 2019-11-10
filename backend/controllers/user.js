@@ -1,24 +1,23 @@
+const mongodb = require('mongodb');
 const User = require('../models/user');
 const Property = require('../models/property');
 
-const mongodb = require('mongodb');
-
 async function getUser(req, res) {
-  const {id} = req.params;
+  const { id } = req.params;
 
   const user = await User.findById(id)
     .populate('properties', 'title')
     .exec();
 
   if (!user) {
-    return  res.status(404).json({
-      status: "error",
-      message: 'User not found.'
+    return res.status(404).json({
+      status: 'error',
+      message: 'User not found.',
     });
-  };
+  }
   return res.status(201).json({
     status: 'ok',
-    data: user
+    data: user,
   });
 }
 
@@ -28,48 +27,47 @@ async function getAllUsers(req, res) {
     .exec();
 
   if (!users.length) {
-    return  res.status(404).json({
-      status: "error",
-      message: 'There is no user.'
+    return res.status(404).json({
+      status: 'error',
+      message: 'There is no user.',
     });
   };
   return res.status(201).json({
     status: 'ok',
-    data: users
+    data: users,
   });
-};
+}
 
 async function userGetProperty(req, res) {
-  const {id: userId, propertyId} = req.params;
-  console.log(userId);
-  console.log(propertyId);
+  const { propertyId } = req.params;
+
   const property = await Property.findById(propertyId).exec();
   if (!property) {
-    return  res.status(404).json({
-      status: "error",
-      message: 'Property not found.'
+    return res.status(404).json({
+      status: 'error',
+      message: 'Property not found.',
     });
   }
   return res.json({
     status: 'ok',
-    data: property
+    data: property,
   });
 }
 
 async function userGetAllProperties(req, res) {
   const properties = await Property.find({
-    user: req.params.id
+    user: req.params.id,
   }).exec();
   return res.status(201).json({
     status: 'ok',
     count: properties.length,
-    data: properties
+    data: properties,
   });
 
 }
 
 async function userAddProperty(req, res) {
-  var newProperty = new Property ({
+  const newProperty = new Property({
     address: req.body.address,
     contact: req.body.contact,
     title: req.body.title,
@@ -89,15 +87,15 @@ async function userAddProperty(req, res) {
   await user.save();
   return res.status(201).json({
     status: 'ok',
-    message: "Property saved.",
-    data:{
-      PropertyID: newProperty._id
-    }
+    message: 'Property saved.',
+    data: {
+      PropertyID: newProperty._id,
+    },
   });
 }
 
 async function userUpdateProperty(req, res) {
-  const {id: userId, propertyId} = req.params;
+  const { propertyId } = req.params;
   const {
     address,
     contact,
@@ -109,7 +107,7 @@ async function userUpdateProperty(req, res) {
     carpark,
     images,
     paymentInterval,
-    content
+    content,
   } = req.body;
   const updatedProperty = await Property.findByIdAndUpdate(
     propertyId,
@@ -124,41 +122,41 @@ async function userUpdateProperty(req, res) {
       carpark,
       images,
       paymentInterval,
-      content
+      content,
     },
-    {new: true}
+    { new: true },
   );
   if (!updatedProperty) {
     return res.status(404).json({
-      status: "error",
-      message: 'Property not found!'
+      status: 'error',
+      message: 'Property not found!',
     });
-  };
+  }
   return res.status(200).json({
     status: 'ok',
-    message: "Property updated.",
+    message: 'Property updated.',
     data: {
-      PropertyID: updatedProperty._id
-    }
+      PropertyID: updatedProperty._id,
+    },
   });
 }
 
 
 async function userDeleteProperty(req, res) {
-  const {id: userId, propertyId} = req.params;
+  const { id: userId, propertyId } = req.params;
   const deletedProperty = await Property.findByIdAndDelete(propertyId);
   if (!deletedProperty) {
     return res.status(404).json({
-      status: "error",
-      message: 'Property not found!'
-    })
+      status: 'error',
+      message: 'Property not found!',
+    });
   }
   const user = await User.findById(userId).exec();
   user.properties.pull(propertyId);
   await user.save();
   return res.status(200).json({
     status: 'ok',
-    message: "Property deleted."
+    message: 'Property deleted.',
   });
 }
 

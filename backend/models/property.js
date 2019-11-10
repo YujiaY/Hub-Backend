@@ -4,75 +4,75 @@ const propertySchema = new mongoose.Schema({
   address: {
     unitNo: {
       type: Number,
-      required: true
+      required: true,
     },
     streetNo: {
       type: String,
-      required: true
+      required: true,
     },
     streetName: {
       type: String,
-      required: true
+      required: true,
     },
     suburbName: {
       type: String,
-      required: true
+      required: true,
     },
     stateName: {
       type: String,
-      required: true
+      required: true,
     },
     postcode: {
       type: Number,
-      required: true
+      required: true,
     }
   },
   contact: {
     type: Number,
-    required: true
+    required: true,
   },
   title: {
     type: String,
-    required: true
+    required: true,
   },
   price: {
     type: Number,
-    required: true
+    required: true,
   },
   type: {
     type: String,
-    required: true
+    required: true,
   },
   bedrooms: {
     type: Number,
-    required: true
+    required: true,
   },
   bathrooms: {
     type: Number,
-    required: true
+    required: true,
   },
   carpark: {
     type: Number,
-    required: true
+    required: true,
   },
   images: {
-    type: [{type: String}],
-    required: true
+    type: [{ type: String }],
+    required: true,
   },
   paymentInterval: {
     type: String,
-    required: true
+    required: true,
   },
   content: {
     type: String,
-    required: true
+    required: true,
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }
+    ref: 'User',
+  },
 },
-  {timestamps: true});
+{ timestamps: true });
 
 const Model = mongoose.model('Property', propertySchema);
 
